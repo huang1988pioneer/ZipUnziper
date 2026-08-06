@@ -1,0 +1,296 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ZipUnziper.ViewModels"
+        xmlns:models="using:ZipUnziper.Models"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="700"
+        x:Class="ZipUnziper.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="{Binding WindowTitle}"
+        Width="1100"
+        Height="720"
+        MinWidth="800"
+        MinHeight="500"
+        DragDrop.AllowDrop="True">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Meta+O" Command="{Binding OpenArchiveCommand}"/>
+        <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenArchiveCommand}"/>
+        <KeyBinding Gesture="Meta+E" Command="{Binding ExtractAllCommand}"/>
+        <KeyBinding Gesture="Ctrl+E" Command="{Binding ExtractAllCommand}"/>
+        <KeyBinding Gesture="Meta+N" Command="{Binding CompressFilesCommand}"/>
+        <KeyBinding Gesture="Ctrl+N" Command="{Binding CompressFilesCommand}"/>
+        <KeyBinding Gesture="Meta+W" Command="{Binding CloseArchiveCommand}"/>
+        <KeyBinding Gesture="Ctrl+W" Command="{Binding CloseArchiveCommand}"/>
+        <KeyBinding Gesture="F5" Command="{Binding RefreshCommand}"/>
+        <KeyBinding Gesture="Back" Command="{Binding GoUpCommand}"/>
+    </Window.KeyBindings>
+
+    <DockPanel>
+        <!-- Menu -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="檔案(_F)">
+                <MenuItem Header="開啟壓縮檔…(_O)" Command="{Binding OpenArchiveCommand}" InputGesture="Meta+O"/>
+                <MenuItem Header="關閉" Command="{Binding CloseArchiveCommand}" InputGesture="Meta+W"/>
+                <Separator/>
+                <MenuItem Header="壓縮檔案…(_C)" Command="{Binding CompressFilesCommand}" InputGesture="Meta+N"/>
+                <MenuItem Header="壓縮資料夾…" Command="{Binding CompressFolderCommand}"/>
+                <Separator/>
+                <MenuItem Header="解壓全部…(_E)" Command="{Binding ExtractAllCommand}" InputGesture="Meta+E"/>
+                <MenuItem Header="解壓選取…(_S)" Command="{Binding ExtractSelectedCommand}"/>
+                <Separator/>
+                <MenuItem Header="重新整理" Command="{Binding RefreshCommand}" InputGesture="F5"/>
+            </MenuItem>
+            <MenuItem Header="檢視(_V)">
+                <MenuItem Header="上一層" Command="{Binding GoUpCommand}" InputGesture="Back"/>
+                <MenuItem Header="根目錄" Command="{Binding GoHomeCommand}"/>
+            </MenuItem>
+            <MenuItem Header="說明(_H)">
+                <MenuItem Header="關於 ZipUnziper"
+                          Click="OnAboutClick"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Status bar -->
+        <Border DockPanel.Dock="Bottom"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="10,6"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+            <Grid ColumnDefinitions="*,Auto,180">
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusText}"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           Opacity="0.9"/>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding SelectionStatus}"
+                           VerticalAlignment="Center"
+                           Margin="16,0"
+                           Opacity="0.75"/>
+                <ProgressBar Grid.Column="2"
+                             Minimum="0"
+                             Maximum="100"
+                             Value="{Binding ProgressValue}"
+                             IsVisible="{Binding IsProgressVisible}"
+                             Height="8"
+                             VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Toolbar -->
+        <Border DockPanel.Dock="Top"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="8,6"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <Button Command="{Binding OpenArchiveCommand}"
+                        ToolTip.Tip="開啟 ZIP (⌘O)"
+                        Padding="12,8"
+                        MinWidth="88">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="📂" FontSize="14"/>
+                        <TextBlock Text="開啟" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding ExtractAllCommand}"
+                        ToolTip.Tip="解壓全部 (⌘E)"
+                        Padding="12,8"
+                        MinWidth="88"
+                        Classes="accent">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="📤" FontSize="14"/>
+                        <TextBlock Text="解壓" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding ExtractSelectedCommand}"
+                        ToolTip.Tip="解壓選取項目"
+                        Padding="12,8"
+                        MinWidth="100">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="📋" FontSize="14"/>
+                        <TextBlock Text="解壓選取" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Separator Width="1" Margin="6,4" Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"/>
+
+                <Button Command="{Binding CompressFilesCommand}"
+                        ToolTip.Tip="壓縮檔案 (⌘N)"
+                        Padding="12,8"
+                        MinWidth="88">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="📥" FontSize="14"/>
+                        <TextBlock Text="壓縮" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding CompressFolderCommand}"
+                        ToolTip.Tip="壓縮資料夾"
+                        Padding="12,8"
+                        MinWidth="110">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="🗂" FontSize="14"/>
+                        <TextBlock Text="壓縮資料夾" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Separator Width="1" Margin="6,4" Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"/>
+
+                <Button Command="{Binding GoUpCommand}"
+                        ToolTip.Tip="上一層 (⌫)"
+                        Padding="12,8"
+                        MinWidth="88">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="⬆" FontSize="14"/>
+                        <TextBlock Text="上一層" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding RefreshCommand}"
+                        ToolTip.Tip="重新整理 (F5)"
+                        Padding="12,8"
+                        MinWidth="88">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="🔄" FontSize="14"/>
+                        <TextBlock Text="重新整理" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding CancelOperationCommand}"
+                        ToolTip.Tip="取消進行中的操作"
+                        Padding="12,8"
+                        MinWidth="72"
+                        IsVisible="{Binding IsBusy}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="⏹" FontSize="14"/>
+                        <TextBlock Text="取消" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- Path / search bar -->
+        <Border DockPanel.Dock="Top"
+                Padding="10,8"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="Auto,*,12,220">
+                <TextBlock Grid.Column="0"
+                           Text="路徑"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0"
+                           Opacity="0.7"/>
+                <TextBox Grid.Column="1"
+                         Text="{Binding PathBarText}"
+                         IsReadOnly="True"
+                         Watermark="尚未開啟壓縮檔 — 可拖放 ZIP 到此視窗"/>
+                <TextBox Grid.Column="3"
+                         Text="{Binding SearchText}"
+                         Watermark="搜尋檔名…"
+                         VerticalContentAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Main content -->
+        <Grid Margin="0">
+            <!-- Empty state -->
+            <Border IsVisible="{Binding !HasArchive}"
+                    Background="Transparent">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="12"
+                            MaxWidth="420">
+                    <TextBlock Text="📦"
+                               FontSize="56"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="ZipUnziper"
+                               FontSize="28"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="預覽、壓縮與解壓縮 ZIP 檔案"
+                               Opacity="0.7"
+                               HorizontalAlignment="Center"
+                               FontSize="15"/>
+                    <TextBlock Text="拖放 ZIP 到此視窗即可預覽內容&#x0a;拖放一般檔案/資料夾可建立壓縮檔"
+                               Opacity="0.55"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,4"/>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Spacing="10"
+                                Margin="0,12,0,0">
+                        <Button Content="開啟壓縮檔…"
+                                Command="{Binding OpenArchiveCommand}"
+                                Padding="16,10"
+                                Classes="accent"/>
+                        <Button Content="壓縮檔案…"
+                                Command="{Binding CompressFilesCommand}"
+                                Padding="16,10"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- File list (Bandizip-style columns) -->
+            <DataGrid x:Name="EntriesGrid"
+                      IsVisible="{Binding HasArchive}"
+                      ItemsSource="{Binding VisibleEntries}"
+                      SelectedItem="{Binding SelectedEntry}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserResizeColumns="True"
+                      CanUserSortColumns="True"
+                      CanUserReorderColumns="True"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      SelectionMode="Extended"
+                      BorderThickness="0"
+                      DoubleTapped="OnEntriesDoubleTapped"
+                      SelectionChanged="OnEntriesSelectionChanged">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header=""
+                                        Binding="{Binding IconGlyph}"
+                                        Width="40"
+                                        CanUserResize="False"
+                                        CanUserSort="False"/>
+                    <DataGridTextColumn Header="名稱"
+                                        Binding="{Binding Name}"
+                                        Width="2*"
+                                        MinWidth="160"/>
+                    <DataGridTextColumn Header="類型"
+                                        Binding="{Binding TypeDisplay}"
+                                        Width="100"/>
+                    <DataGridTextColumn Header="大小"
+                                        Binding="{Binding SizeDisplay}"
+                                        Width="100"/>
+                    <DataGridTextColumn Header="壓縮後"
+                                        Binding="{Binding PackedDisplay}"
+                                        Width="100"/>
+                    <DataGridTextColumn Header="壓縮率"
+                                        Binding="{Binding RatioDisplay}"
+                                        Width="80"/>
+                    <DataGridTextColumn Header="修改日期"
+                                        Binding="{Binding ModifiedDisplay}"
+                                        Width="140"/>
+                    <DataGridTextColumn Header="CRC32"
+                                        Binding="{Binding CrcDisplay}"
+                                        Width="90"/>
+                    <DataGridTextColumn Header="路徑"
+                                        Binding="{Binding FullPath}"
+                                        Width="*"
+                                        MinWidth="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DockPanel>
+</Window>
