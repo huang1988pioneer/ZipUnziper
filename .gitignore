@@ -1,0 +1,33 @@
+## .NET
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.swp
+*~
+.DS_Store
+
+## Avalonia / IDE
+.vs/
+.vscode/
+.idea/
+*.DotSettings.user
+
+## Publish / packages
+publish/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Test / coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
