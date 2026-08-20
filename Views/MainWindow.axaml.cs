@@ -89,7 +89,7 @@ public partial class MainWindow : Window
                     new TextBlock { Text = "以 Avalonia UI 打造的 macOS ZIP 工具", Opacity = 0.8 },
                     new TextBlock
                     {
-                        Text = "功能：預覽 ZIP 內容、壓縮、解壓縮\n介面參考 Bandizip 檔案管理風格",
+                        Text = "功能：預覽 ZIP 內容、壓縮、解壓縮\n採用清楚易用的檔案管理介面",
                         Opacity = 0.7,
                         Margin = new Avalonia.Thickness(0, 8, 0, 0)
                     },

@@ -1,6 +1,6 @@
 # ZipUnziper
 
-以 **Avalonia UI** 打造的跨平台（主打 macOS）ZIP 工具，介面風格參考 [Bandizip](https://www.bandisoft.com/bandizip/)：工具列、路徑列、多欄位檔案清單與狀態列。
+以 **Avalonia UI** 打造的跨平台（主打 macOS）ZIP 工具，提供工具列、路徑列、多欄位檔案清單與狀態列。
 
 ## 功能
 
@@ -38,7 +38,7 @@ dotnet publish -c Release -r osx-arm64 --self-contained false
 Models/          ZIP 項目與進度模型
 Services/        ZipService、檔案對話框
 ViewModels/      MainWindowViewModel（MVVM）
-Views/           Bandizip 風格主視窗
+Views/           應用程式主視窗
 ```
 
 ## 技術

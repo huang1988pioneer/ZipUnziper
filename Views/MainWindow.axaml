@@ -241,7 +241,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- File list (Bandizip-style columns) -->
+            <!-- File list columns -->
             <DataGrid x:Name="EntriesGrid"
                       IsVisible="{Binding HasArchive}"
                       ItemsSource="{Binding VisibleEntries}"
